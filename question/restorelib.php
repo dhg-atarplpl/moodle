@@ -605,8 +605,12 @@
             //mappings in backup_ids to use them later where restoring states (user level).
 
             //Get the answer from DB (by question and answer)
-            $db_answer = get_record ("question_answers","question",$new_question_id,
-                                                    "answer",$answer->answer);
+            if (in_array($CFG->dbfamily, array('mssql', 'oracle'))) {
+                $db_answer = get_record_select('question_answers', "question = '{$new_question_id}' AND answer LIKE '{$answer->answer}'");
+            } else {
+                $db_answer = get_record ('question_answers','question',$new_question_id,
+                                                            'answer',$answer->answer);
+            }
 
             //Do some output
             if (($i+1) % 50 == 0) {
